@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wonder Nibbles - Science Facts</title>
+
+<style>
+  :root{
+    --bg: #0b0f12;
+    --card: #071018;
+    --muted: #9aa4b2;
+    --accent: #22d3ee;
+    --glass: rgba(255,255,255,0.03);
+    --shadow: 0 8px 24px rgba(2,6,23,0.6);
+    --radius: 12px;
+  }
+
+  html,body{height:100%}
+  body{
+    margin:0;
+    min-height:100%;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,var(--bg), #050a0f 200px);
+    color:var(--muted);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+    box-sizing:border-box;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+  }
+
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:22px;
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo{
+    width:56px;height:56px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent), #7dd3fc);
+    display:flex;align-items:center;justify-content:center;
+    color:#0b0f12; font-weight:700; box-shadow:var(--shadow);
+  }
+  h1{margin:0;font-size:20px;color:var(--accent)}
+  p.lead{margin:0;color:var(--muted); font-size:13px}
+
+  /* Controls */
+  .controls{
+    margin-left:auto;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .control{
+    background:var(--card);
+    padding:8px 10px;
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    display:flex; gap:8px; align-items:center;
+  }
+  input[type="search"]{
+    border:0;outline:0;background:transparent;color:inherit;font-size:14px;width:220px;
+  }
+  select{border:0;background:transparent;font-size:14px;color:inherit}
+  button.icon{background:transparent;border:0;cursor:pointer;font-size:16px;color:var(--muted)}
+
+  /* Grid */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:18px;
+    margin-top:22px;
+  }
+
+  .card{
+    background:linear-gradient(180deg,var(--card), var(--glass));
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    transition:transform .18s ease, box-shadow .18s ease;
+    min-height:320px;
+  }
+  .card:hover{ transform:translateY(-6px) }
+  .thumb{
+    position:relative;
+    min-height:160px;
+    background:#0f1724;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover; display:block}
+  .meta{
+    padding:12px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    color:var(--muted);
+    flex:1;
+  }
+  .title{
+    font-weight:600;
+    color:inherit;
+    line-height:1.2;
+    font-size:15px;
+  }
+  .desc{
+    font-size:13px;
+    color:var(--muted);
+    opacity:0.95;
+    margin-top:4px;
+    flex:1;
+  }
+  .row{
+    display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);
+  }
+  .badge{
+    background:rgba(255,255,255,0.05);
+    padding:6px 8px;border-radius:999px;font-size:12px;color:var(--muted);
+  }
+  .views{margin-left:auto;font-weight:600}
+  .thumb a, .title a{
+    text-decoration:none;
+    color:inherit;
+    cursor:pointer;
+  }
+  .thumb a:hover, .title a:hover{
+    opacity:0.8;
+  }
+
+  /* Empty state */
+  .empty{padding:40px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);text-align:center;color:var(--muted)}
+
+  /* small screens */
+  @media (max-width:560px){
+    .controls{ width:100%; margin-top:12px; justify-content:space-between }
+    input[type="search"]{width:120px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">WN</div>
+      <div>
+        <h1>Wonder Nibbles — Videos</h1>
+        <p class="lead">A clean list of latest videos. Auto-generated from the channel feed.</p>
+      </div>
+    </div>
+
+    <div class="controls" aria-hidden="false">
+      <div class="control">
+        <svg width="16" height="16" viewBox="0 0 24 24" style="opacity:.7"><path fill="currentColor" d="M9.5 3a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13m0-2a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM21 21l-5.2-5.2"/></svg>
+        <input id="q" type="search" placeholder="Search title or description" />
+      </div>
+
+      <div class="control">
+        <label for="sort" style="font-size:13px;color:var(--muted);margin-right:6px">Sort</label>
+        <select id="sort">
+          <option value="new">Newest</option>
+          <option value="views">Popular</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <button id="liveLoad" class="icon" title="Reload feed">🔁</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content">
+    <div id="status" class="empty">Loading feed…</div>
+    <div id="grid" class="grid" hidden></div>
+  </main>
+</div>
+
+
+<script>
+/* ---- Utilities ---- */
+function el(tag, props={}, children=null){
+  const e = document.createElement(tag);
+  for(const k in props) e.setAttribute(k, props[k]);
+  if(children!==null) {
+    if(typeof children === 'string') e.innerHTML = children;
+    else children.forEach(c => e.appendChild(c));
+  }
+  return e;
+}
+function formatDate(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  }catch(e){return iso}
+}
+function shortText(s, n=160){
+  if(!s) return '';
+  return s.length>n ? s.slice(0,n).trim() + '…' : s;
+}
+
+/* ---- Parse the feed XML document and return array of entries ---- */
+function parseFeedXml(xmlDoc){
+  // xmlDoc: Document
+  // The feed uses namespaces; using getElementsByTagNameNS is robust.
+  const nsAtom = "http://www.w3.org/2005/Atom";
+  const nsMedia = "http://search.yahoo.com/mrss/";
+  const items = [];
+  const entries = xmlDoc.getElementsByTagNameNS(nsAtom, "entry");
+  for(let i=0;i<entries.length;i++){
+    const e = entries[i];
+    const title = e.getElementsByTagNameNS(nsAtom, "title")[0]?.textContent || '';
+    const published = e.getElementsByTagNameNS(nsAtom, "published")[0]?.textContent || '';
+    const videoId = e.getElementsByTagNameNS("http://www.youtube.com/xml/schemas/2015","videoId")[0]?.textContent 
+                    || (e.getElementsByTagNameNS(nsAtom,"id")[0]?.textContent || '').replace('yt:video:','');
+    // media group
+    const mediaGroup = e.getElementsByTagNameNS(nsMedia, "group")[0];
+    let thumb = null, desc='', views = null, rating = null;
+    if(mediaGroup){
+      const thumbEl = mediaGroup.getElementsByTagNameNS(nsMedia, "thumbnail")[0];
+      thumb = thumbEl ? thumbEl.getAttribute('url') : null;
+      const descEl = mediaGroup.getElementsByTagNameNS(nsMedia, "description")[0];
+      desc = descEl ? descEl.textContent : '';
+      const community = mediaGroup.getElementsByTagNameNS(nsMedia, "community")[0];
+      if(community){
+        const stats = community.getElementsByTagNameNS(nsMedia, "statistics")[0];
+        if(stats) views = stats.getAttribute('views');
+        const star = community.getElementsByTagNameNS(nsMedia, "starRating")[0];
+        if(star) rating = star.getAttribute('average');
+      }
+    }
+    items.push({
+      title, published, videoId, thumb, desc, views: views ? parseInt(views,10) : 0, rating: rating ? parseFloat(rating) : null
+    });
+  }
+  return items;
+}
+
+/* ---- Render functions ---- */
+function renderGrid(items){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if(!items.length){
+    document.getElementById('status').hidden = false;
+    document.getElementById('status').className = 'empty';
+    document.getElementById('status').innerText = 'No videos found.';
+    grid.hidden = true;
+    return;
+  }
+  document.getElementById('status').hidden = true;
+  grid.hidden = false;
+
+  // Show only first 20 entries
+  const displayItems = items.slice(0, 20);
+
+  displayItems.forEach(it=>{
+    const card = el('article',{class:'card'});
+    const thumbWrap = el('div',{class:'thumb'});
+    const thumbLink = el('a',{href:`https://www.youtube.com/watch?v=${it.videoId}`, target:'_blank', rel:'noopener noreferrer'});
+    const img = el('img');
+    img.src = it.thumb || `https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg`;
+    img.alt = it.title;
+    thumbLink.appendChild(img);
+
+    // play overlay
+    const play = el('div');
+    play.style.position='absolute'; play.style.right='12px'; play.style.top='12px';
+    play.innerHTML = `<div style="background:rgba(0,0,0,0.5);color:#fff;padding:6px 8px;border-radius:8px;font-weight:700;font-size:12px">▶ WATCH</div>`;
+    thumbWrap.style.position='relative';
+    thumbWrap.appendChild(thumbLink);
+    thumbWrap.appendChild(play);
+
+    const meta = el('div',{class:'meta'});
+    const titleLink = el('a',{href:`https://www.youtube.com/watch?v=${it.videoId}`, target:'_blank', rel:'noopener noreferrer'});
+    const t = el('div',{class:'title'}, [document.createTextNode(it.title)]);
+    titleLink.appendChild(t);
+    const d = el('div',{class:'desc'}, [document.createTextNode(shortText(it.desc,180))]);
+    const row = el('div',{class:'row'});
+    const pub = el('div',{class:'badge'}, formatDate(it.published));
+    const views = el('div',{class:'views'}, (it.views? it.views.toLocaleString() + ' views' : ''));
+    row.appendChild(pub);
+    row.appendChild(views);
+
+    meta.appendChild(titleLink);
+    meta.appendChild(d);
+    meta.appendChild(row);
+
+    card.appendChild(thumbWrap);
+    card.appendChild(meta);
+    grid.appendChild(card);
+  });
+}
+
+/* ---- App logic: always fetch live feed on load ---- */
+let allItems = [];
+const FEED_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UC8NXLpC83TCgvUN80ZNqV3Q';
+
+async function loadLiveFeed(){
+  document.getElementById('status').hidden = false;
+  document.getElementById('status').innerText = 'Fetching live feed…';
+  document.getElementById('grid').hidden = true;
+  try{
+    // Use rss2json proxy to avoid CORS (free). If you host on a server, fetch feed directly instead.
+    const proxy = 'https://api.rss2json.com/v1/api.json?rss_url=';
+    const res = await fetch(proxy + encodeURIComponent(FEED_URL));
+    if(!res.ok) throw new Error('Failed to fetch feed: ' + res.status);
+    const data = await res.json();
+    if(!data.items) throw new Error('Feed returned unexpected format.');
+    // Convert rss2json items to the same structure used above
+    allItems = data.items.map(it=>{
+      const vid = (it.guid || '').replace('yt:video:','') || (it.link && it.link.split('/').pop());
+      return {
+        title: it.title || '',
+        published: it.pubDate || it.isoDate || '',
+        videoId: vid,
+        thumb: (it.thumbnail || it.enclosure?.link) || `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
+        desc: it.description || it.content || '',
+        views: it.views ? parseInt(it.views,10) : (it.youtube_stat ? parseInt(it.youtube_stat,10) : 0)
+      };
+    });
+    // default sort newest first
+    allItems.sort((a,b)=> new Date(b.published) - new Date(a.published));
+    applyFilters(true);
+  }catch(err){
+    document.getElementById('status').hidden = false;
+    document.getElementById('status').className = 'empty';
+    document.getElementById('status').innerText = 'Error loading live feed: ' + err.message;
+    console.error(err);
+  }
+}
+
+/* Load live feed on page load */
+loadLiveFeed();
+
+/* Controls */
+const q = document.getElementById('q');
+q.addEventListener('input', ()=>applyFilters());
+document.getElementById('sort').addEventListener('change', ()=>applyFilters());
+document.getElementById('liveLoad').addEventListener('click', ()=>{
+  loadLiveFeed();
+});
+
+/* filtering + sorting */
+function applyFilters(skipRender=false){
+  const qv = q.value.trim().toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let items = allItems.slice();
+  if(qv){
+    items = items.filter(it => (it.title + ' ' + it.desc).toLowerCase().includes(qv));
+  }
+  if(sort === 'new') items.sort((a,b)=> new Date(b.published) - new Date(a.published));
+  else if(sort === 'views') items.sort((a,b)=> (b.views||0) - (a.views||0));
+  renderGrid(items);
+}
+
+/* small UX niceties: press Enter on search to clear */
+q.addEventListener('keydown', (ev)=>{ if(ev.key === 'Escape') { q.value=''; applyFilters(); } });
+
+</script>
+</body>
+</html>
